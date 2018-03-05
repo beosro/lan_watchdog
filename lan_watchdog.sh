@@ -9,8 +9,8 @@ reboot_host()
 {
    # add an entry in syslog to keep track of down times
    logger -p0 "WIFI_GW is unreachable - going down for reboot"
-   echo "simulating: un-comment next line to apply a reboot" 
-   # reboot
+   # echo "simulating: un-comment next line to apply a reboot" 
+   reboot
 }
 
 # host we should always be able to reach when wi-fi is up
