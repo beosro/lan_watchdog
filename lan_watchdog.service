@@ -1,0 +1,12 @@
+[Unit]
+Description=lan_watchdog service
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/lan_watchdog.sh
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+
