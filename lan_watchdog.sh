@@ -13,14 +13,25 @@ reboot_host()
    reboot
 }
 
+reboot_wifi()
+{
+   echo "Network connection down! Attempting reconnection."
+   /sbin/ifdown $WLAN
+   sleep 5
+   /sbin/ifup --force $WLAN
+}
+
+# which interface should the script listen to
+WLAN="wlan0"
+
 # host we should always be able to reach when wi-fi is up
 WIFI_GW="192.168.1.1"
 
 # number of seconds to wait before checking arping again
-SLEEP_SECS=60
+SLEEP_SECS=600
 
 # number of times arping is allowed to fail before a reboot
-MAX_TIMES_DOWN=5
+MAX_TIMES_DOWN=3
 
 # number of consecutive times, in loop, that WIFI_GW has been unreachable
 down_count=0
@@ -28,19 +39,25 @@ down_count=0
 # loop forever
 while [ 1 ]; do
 
-   # check using two  arp packets - if arping returns non-zero status, assume it's an error
-   arping -c 2 ${WIFI_GW}
-   result=$?
+  # check using two  arp packets - if arping returns non-zero status, assume it's an error
+  arping -c 2 ${WIFI_GW}
+  result=$?
 
-   # if ping result is non-zero, add to the down counter
-   #   if result is zero (successful) reset down_count (temp network hiccup?)
-   test ${result} -ne 0 && let down_count="$down_count+1"
-   test ${result} -eq 0 && down_count=0
+  if [ ${result} -ne 0 ]
+  then
+    let down_count="$down_count+1"
+  else
+    down_count=0
+  fi
 
-   # if arping fails in the loop MAX_TIMES_DOWN (consecutively) then reboot
-   test $down_count -gt ${MAX_TIMES_DOWN} && reboot_host
+  if [ $down_count -gt 0 ]; then
+    if [ $down_count -le ${MAX_TIMES_DOWN} ]; then
+      reboot_wifi
+    else
+      reboot_host
+    fi
+  fi
 
-   # wait a while before checking again
-   sleep ${SLEEP_SECS};
+  sleep ${SLEEP_SECS};
 
 done
