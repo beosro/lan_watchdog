@@ -12,7 +12,8 @@ if [ "$XUID" != "0" ]; then
 fi
 echo -e "[ \e[0;36m++++++++++\e[0m ] $XUID USER OK!"
 
-echo -e "[ \e[0;36m++++++++++\e[0m ] INSTALL USEFUL STUFF"
+echo -e "[ \e[0;36m++++++++++\e[0m ] INSTALL ARPING"
+apt-get update
 apt-get -y install arping
 echo -e "[ \e[0;36m++++++++++\e[0m ] DONE"
 
